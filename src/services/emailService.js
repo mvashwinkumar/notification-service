@@ -19,7 +19,7 @@ async function sendEmails(userEmails, subject, templateFn, data) {
         from: email.from,
         to: userEmails,
         subject,
-        html: templateFn(data),
+        html: templateFn({ data }),
     });
 }
 

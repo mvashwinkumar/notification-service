@@ -5,9 +5,7 @@ const EmailStrategy = require('../strategies/EmailStrategy');
 const emailStrategy = new EmailStrategy({
   emailTemplateName: 'myEmail',
   shouldSendEmail: (results) => results.length > 0,
-  sendUserListPipeline: [
-    // ...
-  ],
+  userEmails: [''],
 });
 
 const query1 = new QueryConfig({
@@ -21,7 +19,7 @@ const query1 = new QueryConfig({
   ],
   executionType: 'watch',
   targetCollection: 'coll-name',
-  strategies: [new LogStrategy(), emailStrategy], // Add more strategies here
+  strategies: [new LogStrategy()], // Add more strategies here
 });
 
 module.exports = query1;
