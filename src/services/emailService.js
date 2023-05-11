@@ -1,34 +1,25 @@
-const fs = require('fs');
 const path = require('path');
-const handlebars = require('handlebars');
 const nodemailer = require('nodemailer');
 
+const { email } = require('../config');
+
 const transporter = nodemailer.createTransport({
-    host: '',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    host: email.host,
+    port: email.port,
+    secure: email.secure, // true for 465, false for other ports
     auth: {
-        user: '', // your email address
-        pass: '' // your email password or access token
+        user: email.user, // your email address
+        pass: email.pass // your email password or access token
     }
 });
 
-async function renderTemplate(templateName, data) {
-  const templatePath = path.join(__dirname, '..', 'emailTemplates', `${templateName}.hbs`);
-  const templateContent = await fs.promises.readFile(templatePath, 'utf-8');
-  const template = handlebars.compile(templateContent);
-  return template(data);
-}
-
-async function sendEmails(userEmails, subject, templateName, data) {
-    const template = await renderTemplate(templateName, data);
-
+async function sendEmails(userEmails, subject, templateFn, data) {
     await transporter.verify();
     await transporter.sendMail({
-        from: '',
+        from: email.from,
         to: userEmails,
         subject,
-        html: template,
+        html: templateFn(data),
     });
 }
 

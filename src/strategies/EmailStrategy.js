@@ -1,18 +1,24 @@
+const fs = require('fs');
+const path = require('path');
+const handlebars = require('handlebars');
+
 const NotificationStrategy = require('./NotificationStrategy');
 const emailService = require('../services/emailService');
-const mongoService = require('../services/mongoService');
 
 class EmailStrategy extends NotificationStrategy {
-  constructor({ emailTemplate, shouldSendEmail }) {
+  constructor({ emailTemplateName, emailSubject, userEmails, shouldSendEmail }) {
     super();
-    this.emailTemplate = emailTemplate;
     this.shouldSendEmail = shouldSendEmail;
+    this.emailSubject = emailSubject;
+    this.userEmails = userEmails;
+    const templatePath = path.join(__dirname, '..', 'emailTemplates', `${emailTemplateName}.hbs`);
+    const templateContent = fs.readFileSync(templatePath, 'utf-8');
+    this.emailTemplateFn = handlebars.compile(templateContent);
   }
 
   async execute(results) {
     if (this.shouldSendEmail(results)) {
-      const userEmails = await mongoService.getUserEmails();
-      await emailService.sendEmails(userEmails, this.emailTemplate, results);
+      await emailService.sendEmails(this.userEmails, this.emailSubject, this.emailTemplateFn, results);
     }
   }
 }

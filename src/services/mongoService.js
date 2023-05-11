@@ -6,7 +6,7 @@ const { mongo } = require('../config');
 let client;
 
 const connect = async () => {
-    if (!(client && client.isConnected())) {
+    if (!(client && client?.isConnected?.())) {
         client = new MongoClient(mongo.url, { useNewUrlParser: true, useUnifiedTopology: true });
         await client.connect();
     }
@@ -47,6 +47,7 @@ async function watchCollection(targetCollection, pipeline, callback) {
             console.log(`Change detected and processed`);
         } catch (error) {
             console.error(`Error processing change: ${error.message}`);
+            console.error(error.stack);
         }
     });
 }

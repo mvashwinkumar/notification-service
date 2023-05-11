@@ -1,10 +1,15 @@
+const fs = require('fs');
+const path = require('path');
+
 const cron = require('node-cron');
 const mongoService = require('./services/mongoService');
-const checkQuery = require('./queries/checkQuery');
-const query1 = require('./queries/query1');
 
-// const queries = [query1];
-const queries = [checkQuery];
+const loadQueries = () => {
+    const queryFolderPath = path.join(__dirname, 'queries');
+    const queryFiles = fs.readdirSync(queryFolderPath);
+    const queries = queryFiles.map((file) => require(path.join(queryFolderPath, file)));
+    return queries;
+}
 
 const handleResults = async (query, results) => {
     for (const strategy of query.strategies) {
@@ -13,6 +18,8 @@ const handleResults = async (query, results) => {
 };
 
 console.log('Starting Notication Service...');
+
+const queries = loadQueries();
 console.log(`Found ${queries.length} queries to execute: ${queries.map((query) => query.name).join(', ')}`);
 
 queries.forEach((query) => {
@@ -30,6 +37,7 @@ queries.forEach((query) => {
                 await handleResults(query, results);
             } catch (error) {
                 console.error(`Error executing query: ${error.message}`);
+                console.error(error.stack);
             }
         });
     } else if (query.executionType === 'once') {
@@ -40,9 +48,11 @@ queries.forEach((query) => {
                 await handleResults(query, results);
             } catch (error) {
                 console.error(`Error executing query: ${error.message}`);
+                console.error(error.stack);
             }
         })();
     } else {
         console.error(`Invalid execution type: ${query.executionType}`);
     }
+    console.log(`Query ${query.name} setup for execution`);
 });

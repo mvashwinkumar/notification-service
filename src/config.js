@@ -8,10 +8,11 @@ const config = {
     },
     email: {
         host: process.env.EMAIL_HOST,
-        port: int(process.env.EMAIL_PORT),
-        secure: process.env.EMAIL_SECURE,
+        port: parseInt(process.env.EMAIL_PORT),
+        secure: process.env.EMAIL_SECURE === 'true',
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
+        from: process.env.EMAIL_FROM,
     },
     webhooks: {
         url: process.env.WEBHOOK_URL,
