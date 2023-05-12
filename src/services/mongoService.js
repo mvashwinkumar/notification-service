@@ -13,12 +13,17 @@ const connect = async () => {
     return client.db(mongo.dbName)
 };
 
+const getAggregationPipeline = (queryPipeline) => {
+    // if queryPipeline is a function, execute it to get the pipeline
+    return Array.isArray(queryPipeline) ? queryPipeline : queryPipeline();
+}
+
 const executeAggregation = async (targetCollection, pipeline, options) => {
     const db = await connect();
     const collection = db.collection(targetCollection);
 
     try {
-        return await collection.aggregate(pipeline, options).toArray();
+        return await collection.aggregate(getAggregationPipeline(pipeline), options).toArray();
     } catch (error) {
         console.error(`Error executing aggregation: ${error.message}`);
         throw error;
@@ -41,7 +46,7 @@ async function watchCollection(targetCollection, pipeline, callback) {
     const db = await connect();
     const collection = db.collection(targetCollection);
 
-    collection.watch(pipeline, { fullDocumentBeforeChange: "whenAvailable" }).on('change', async (change) => {
+    collection.watch(getAggregationPipeline(pipeline), { fullDocumentBeforeChange: "whenAvailable" }).on('change', async (change) => {
         try {
             await callback(change);
             console.log(`Change detected and processed`);

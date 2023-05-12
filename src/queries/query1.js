@@ -4,34 +4,32 @@ const EmailStrategy = require('../strategies/EmailStrategy');
 const InsertCollectionStrategy = require('../strategies/InsertCollectionStrategy');
 const WebhookStrategy = require('../strategies/WebhookStrategy');
 
-const emailStrategy = new EmailStrategy({
-  emailTemplateName: 'myEmail',
-  emailSubject: 'Testing email strategy',
-  shouldSendEmail: (results) => results.length > 0,
-  userEmails: ['']
-});
-
-// const insertCollectionStrategy = new InsertCollectionStrategy({
-//   targetCollection: 'newRecords',
-//   processResults: (results) => results, // Implement your data transformation here
-// });
-
-const webhookStrategy = new WebhookStrategy({
-  webhookURL: 'https://example.com/webhook',
-  webhookTransformer: (results) => results, // Implement your data transformation here
-});
-
-const query1 = new QueryConfig({
+module.exports = new QueryConfig({
   name: 'query1',
+  enabled: true,
+  targetCollection: 'dataInfo',
+  executionType: 'cron', // 'watch' or 'cron' or 'once'
+  cronSchedule: '* * * * *', // Execute every minute
   pipeline: [
     {
       $count: 'total',
     }
   ],
-  executionType: 'cron', // 'watch' or 'cron' or 'once'
-  targetCollection: 'dataInfo',
-  cronSchedule: '* * * * *', // Execute every hour
-  strategies: [new LogStrategy(), emailStrategy], // Add more strategies here
+  strategies: [
+    new LogStrategy(),
+    new EmailStrategy({
+      emailTemplateName: 'myEmail',
+      emailSubject: 'Testing email strategy',
+      shouldSendEmail: (results) => results.length > 0,
+      userEmails: ['']
+    }),
+    new InsertCollectionStrategy({
+      targetCollection: 'newRecords',
+      processResults: (results) => results, // Implement your data transformation here
+    }),
+    new WebhookStrategy({
+      webhookURL: 'https://example.com/webhook',
+      webhookTransformer: (results) => results, // Implement your data transformation here
+    })
+  ],
 });
-
-module.exports = query1;

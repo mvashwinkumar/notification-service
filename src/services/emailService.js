@@ -21,6 +21,7 @@ async function sendEmails(userEmails, subject, templateFn, data) {
         subject,
         html: templateFn({ data }),
     });
+    console.log(`Email sent.`);
 }
 
 module.exports = {

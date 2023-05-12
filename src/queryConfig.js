@@ -1,6 +1,8 @@
 class QueryConfig {
-    constructor({ name, pipeline, options, executionType, cronSchedule, targetCollection, strategies }) {
+    constructor({ name, enabled, pipeline, options, executionType, cronSchedule, targetCollection, strategies }) {
         this.name = name;
+        this.enabled = enabled || false;
+        // Array of aggregation pipeline stages or function that returns an array of aggregation pipeline stages
         this.pipeline = pipeline;
         this.options = options || {};
         this.cronSchedule = cronSchedule;

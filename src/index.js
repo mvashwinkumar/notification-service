@@ -7,7 +7,8 @@ const mongoService = require('./services/mongoService');
 const loadQueries = () => {
     const queryFolderPath = path.join(__dirname, 'queries');
     const queryFiles = fs.readdirSync(queryFolderPath);
-    const queries = queryFiles.map((file) => require(path.join(queryFolderPath, file)));
+    let queries = queryFiles.map((file) => require(path.join(queryFolderPath, file)));
+    queries = queries.filter((query) => query.enabled);
     return queries;
 }
 
