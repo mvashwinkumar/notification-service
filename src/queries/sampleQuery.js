@@ -32,6 +32,8 @@ module.exports = new QueryConfig({
       emailSubject: 'Testing email strategy',
       // condition to check if the email should be sent
       shouldSendEmail: (results) => results.length > 0,
+      // function to transform the results before sending to the email template
+      processResults: (results) => results, // Implement your data transformation here
       // list of email addresses to send the email to
       userEmails: [''],
     }),
